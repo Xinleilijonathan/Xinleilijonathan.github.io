@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Xinlei Li</title>
+<meta name="description" content="Xinlei Li — M.S. ECE at Northeastern University. Robot learning, vision-language-action models, teleoperation, and world models.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,400..900&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: engineering graph paper. Full-width hero (statement left, live teleop arm right), then a label-gutter column like a drawing's title block. */
+:root {
+  --paper: #F5F7F9;     /* drafting white, cool */
+  --grid: #E1E7EE;      /* minor grid line */
+  --grid-major: #CCD5DF;
+  --ink: #0F1A2A;       /* drafting navy-black */
+  --muted: #56647A;
+  --panel: #FFFFFF;
+  --signal: #DD5A12;    /* robot safety orange — the arm, live values, highlights */
+  --signal-soft: #FBE6D9;
+
+  --f-display: "Archivo", "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+  --t-xs: 0.74rem; --t-sm: 0.86rem; --t-md: 1rem; --t-lg: 1.28rem; --t-xl: 1.7rem;
+  --t-hero: clamp(3rem, 9vw, 6.6rem);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0C131D; --grid: #141E2B; --grid-major: #1C2939; --ink: #E3E9F2; --muted: #8E9CB1;
+    --panel: #111A26; --signal: #FF8B45; --signal-soft: #2A1C14; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0C131D; --grid: #141E2B; --grid-major: #1C2939; --ink: #E3E9F2; --muted: #8E9CB1;
+  --panel: #111A26; --signal: #FF8B45; --signal-soft: #2A1C14; color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; color: var(--ink); font-family: var(--f-body); font-size: var(--t-md); line-height: 1.62;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid-major) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: underline; text-decoration-color: var(--signal); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+a:hover { color: var(--signal); }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
+
+.shell { max-width: 1160px; margin: 0 auto; padding-inline: 24px; }
+
+/* ---------- top bar ---------- */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--paper);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  border-bottom: 1px solid var(--grid-major);
+}
+.bar .shell { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.mark { font-family: var(--f-display); font-weight: 800; font-stretch: 115%; font-size: var(--t-sm); letter-spacing: 0.02em; text-decoration: none; }
+.nav { display: flex; gap: 20px; flex-wrap: wrap; font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.08em; }
+.nav a { text-decoration: none; color: var(--muted); }
+.nav a:hover { color: var(--signal); }
+
+/* ---------- hero ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 40px; align-items: center; padding-block: 64px 48px; }
+.hero-text { display: grid; gap: 22px; min-width: 0; }
+.eyebrow { font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 0; }
+.hero h1 {
+  margin: 0; font-family: var(--f-display); font-weight: 900; font-stretch: 125%;
+  font-size: var(--t-hero); line-height: 0.88; letter-spacing: -0.035em; text-transform: uppercase;
+}
+.hero h1 span { display: block; }
+.hero h1 .li { color: var(--signal); }
+.thesis { margin: 0; font-size: var(--t-lg); line-height: 1.45; max-width: 30ch; text-wrap: balance; }
+.thesis em { font-style: normal; background: var(--signal-soft); padding: 0 4px; }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn {
+  font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.08em;
+  text-decoration: none; border: 1.5px solid var(--ink); padding: 8px 14px; background: var(--panel); color: var(--ink);
+}
+.btn:hover { border-color: var(--signal); color: var(--signal); }
+.btn.primary { background: var(--ink); color: var(--paper); }
+.btn.primary:hover { background: var(--signal); border-color: var(--signal); color: var(--paper); }
+.status { display: inline-flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: var(--t-xs); color: var(--ink); }
+.status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--signal); box-shadow: 0 0 0 4px var(--signal-soft); }
+.email-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-family: var(--f-mono); font-size: var(--t-xs); color: var(--muted); }
+.email { user-select: all; color: var(--ink); word-break: break-all; }
+.copy { font: 500 var(--t-xs) var(--f-mono); background: transparent; color: var(--signal); border: 1px solid var(--grid-major); padding: 2px 8px; cursor: pointer; }
+.copy:hover { border-color: var(--signal); }
+
+/* teleop panel */
+.teleop { background: var(--panel); border: 1.5px solid var(--ink); display: grid; min-width: 0; }
+.teleop-head, .teleop-foot {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  font-family: var(--f-mono); font-size: var(--t-xs); color: var(--muted); padding: 8px 12px;
+}
+.teleop-head { border-bottom: 1px solid var(--grid-major); }
+.teleop-foot { border-top: 1px solid var(--grid-major); font-variant-numeric: tabular-nums; }
+.teleop-foot b { color: var(--signal); font-weight: 500; }
+.stage { position: relative; aspect-ratio: 4 / 3; max-width: 100%; touch-action: none; cursor: crosshair; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+
+/* ---------- body sections ---------- */
+.block { display: grid; grid-template-columns: 190px minmax(0, 1fr); gap: 32px; padding-block: 44px; border-top: 1.5px solid var(--ink); scroll-margin-top: 60px; }
+.label { font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); display: grid; gap: 4px; align-content: start; }
+.label strong { font-family: var(--f-display); font-stretch: 112%; font-weight: 800; font-size: var(--t-lg); letter-spacing: -0.01em; color: var(--ink); text-transform: none; line-height: 1.1; }
+.content { display: grid; gap: 22px; min-width: 0; }
+p { margin: 0; max-width: 68ch; }
+h3 { margin: 0; font-family: var(--f-display); font-stretch: 108%; font-weight: 750; font-size: var(--t-lg); line-height: 1.2; letter-spacing: -0.01em; text-wrap: balance; }
+.mono { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--muted); font-variant-numeric: tabular-nums; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }
+.chips li { font-family: var(--f-mono); font-size: var(--t-xs); border: 1px solid var(--ink); padding: 3px 9px; background: var(--panel); }
+
+/* news */
+.log { list-style: none; margin: 0; padding: 0; display: grid; }
+.log li { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 18px; padding-block: 9px; border-bottom: 1px dashed var(--grid-major); }
+.log li:last-child { border-bottom: 0; }
+.log .mono { padding-top: 3px; }
+
+/* research */
+.rig { background: var(--panel); border: 1.5px solid var(--ink); display: grid; }
+.rig-head { padding: 22px 24px 18px; display: grid; gap: 6px; border-bottom: 1px solid var(--grid-major); }
+.rig-row { display: flex; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; align-items: baseline; }
+.flow { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--grid-major); }
+.flow li { padding: 14px 16px; display: grid; gap: 4px; border-right: 1px solid var(--grid-major); position: relative; }
+.flow li:last-child { border-right: 0; }
+.flow .n { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--signal); }
+.flow .t { font-family: var(--f-display); font-weight: 700; font-stretch: 110%; }
+.flow .d { font-size: var(--t-sm); color: var(--muted); line-height: 1.45; }
+.flow li:not(:last-child)::after { content: "→"; position: absolute; right: -0.55em; top: 12px; font-family: var(--f-mono); color: var(--signal); background: var(--panel); line-height: 1; padding-block: 2px; }
+.rig-body { padding: 20px 24px 24px; display: grid; gap: 16px; }
+ul.points { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; max-width: 72ch; }
+ul.points li::marker { color: var(--signal); content: "■  "; font-size: 0.7em; }
+
+/* projects */
+.projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.proj { background: var(--panel); border: 1px solid var(--grid-major); padding: 20px 22px; display: grid; gap: 12px; align-content: start; }
+.proj.wide { grid-column: 1 / -1; border: 1.5px solid var(--ink); }
+.proj-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px 14px; flex-wrap: wrap; }
+.readouts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--grid-major); }
+.readout { padding: 10px 12px; display: grid; gap: 2px; border-right: 1px solid var(--grid-major); }
+.readout:last-child { border-right: 0; }
+.readout b { font-family: var(--f-mono); font-weight: 500; font-size: 1.1rem; color: var(--signal); font-variant-numeric: tabular-nums; }
+.readout span { font-size: var(--t-xs); color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 6px 12px; font-family: var(--f-mono); font-size: var(--t-xs); color: var(--muted); }
+.tags a { color: var(--ink); }
+
+/* publications */
+.pub { display: grid; gap: 8px; padding-left: 18px; border-left: 3px solid var(--signal); }
+.pub-title { font-family: var(--f-display); font-weight: 700; font-stretch: 105%; font-size: 1.1rem; line-height: 1.3; }
+.authors { font-size: var(--t-sm); color: var(--muted); }
+.authors strong { color: var(--ink); background: var(--signal-soft); padding: 0 3px; font-weight: 600; }
+.venue { font-size: var(--t-sm); font-style: italic; }
+
+/* experience / education */
+.rows { display: grid; gap: 26px; }
+.row { display: grid; gap: 6px; }
+.row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px 16px; flex-wrap: wrap; }
+.org { font-size: var(--t-sm); color: var(--muted); }
+
+/* skills */
+.spec { display: grid; grid-template-columns: 12em minmax(0, 1fr); margin: 0; border-top: 1px solid var(--grid-major); }
+.spec dt, .spec dd { padding-block: 10px; border-bottom: 1px solid var(--grid-major); margin: 0; }
+.spec dt { font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding-top: 13px; }
+.spec dd { font-size: var(--t-sm); min-width: 0; }
+
+footer { border-top: 1.5px solid var(--ink); padding-block: 22px 48px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: minmax(0, 1fr); padding-block: 40px 32px; }
+  .block { grid-template-columns: minmax(0, 1fr); gap: 18px; padding-block: 34px; }
+  .nav { display: none; }
+}
+@media (max-width: 620px) {
+  .shell { padding-inline: 16px; }
+  .projects { grid-template-columns: minmax(0, 1fr); }
+  .flow { grid-template-columns: minmax(0, 1fr); }
+  .flow li { border-right: 0; border-bottom: 1px dashed var(--grid-major); }
+  .flow li:last-child { border-bottom: 0; }
+  .flow li:not(:last-child)::after { display: none; }
+  .readouts { grid-template-columns: minmax(0, 1fr); }
+  .readout { border-right: 0; border-bottom: 1px solid var(--grid-major); }
+  .readout:last-child { border-bottom: 0; }
+  .log li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .spec { grid-template-columns: minmax(0, 1fr); }
+  .spec dt { border-bottom: 0; padding-bottom: 0; }
+  .rig-head, .rig-body { padding-inline: 18px; }
+}
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="shell">
+    <a class="mark" href="#top">XINLEI LI</a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#research">Research</a>
+      <a href="#projects">Projects</a>
+      <a href="#publications">Publications</a>
+      <a href="#experience">Experience</a>
+      <a href="cv.pdf">CV</a>
+    </nav>
+  </div>
+</header>
+
+<div class="shell" id="top">
+  <section class="hero" aria-label="Introduction">
+    <div class="hero-text">
+      <p class="eyebrow">Robot learning · Northeastern University ECE</p>
+      <h1><span>Xinlei</span><span class="li">Li</span></h1>
+      <p class="thesis">I teach real robots from human demonstrations, and I want them to learn <em>beyond</em> those demonstrations with RL and world models.</p>
+      <span class="status">Seeking robotics PhD positions · Spring &amp; Fall 2027</span>
+      <div class="cta">
+        <a class="btn primary" href="cv.pdf">CV (PDF)</a>
+        <a class="btn" href="https://github.com/Xinleilijonathan">GitHub</a>
+        <a class="btn" href="https://www.linkedin.com/in/lxl2001">LinkedIn</a>
+        <a class="btn" href="https://doi.org/10.1117/12.3012472">Paper</a>
+      </div>
+      <div class="email-row">
+        <span>email</span>
+        <span class="email" id="email">xinleijonathan.li@gmail.com</span>
+        <button class="copy" id="copy-email" type="button">Copy</button>
+      </div>
+    </div>
+
+    <figure class="teleop" style="margin:0" aria-label="Interactive two-link arm that follows the pointer">
+      <div class="teleop-head"><span>leader → follower</span><span id="mode">mode: autonomous</span></div>
+      <div class="stage" id="stage"><canvas id="arm"></canvas></div>
+      <div class="teleop-foot">
+        <span>θ1 <b id="q1">0.0°</b></span>
+        <span>θ2 <b id="q2">0.0°</b></span>
+        <span>ee <b id="ee">0.000, 0.000 m</b></span>
+        <span>move pointer to teleoperate</span>
+      </div>
+    </figure>
+  </section>
+
+  <section class="block" id="about">
+    <div class="label">About<strong>Research focus</strong></div>
+    <div class="content">
+      <p>I am a final-semester M.S. student in Electrical and Computer Engineering at Northeastern University (Seattle), graduating December 2026. My current research studies how vision-language-action models adapt to real robots: how teleoperation quality, demonstration count, and camera setup shape what a fine-tuned policy can do, and where it fails under distribution shift.</p>
+      <p>For my PhD, I want to build embodied agents that learn from limited real-world data. I am especially interested in combining VLA policies with reinforcement learning and learned world models, so a robot can predict the outcome of its actions and improve past its demonstrations. Before robotics, I earned a B.S. in Computer Science at Wenzhou-Kean University and published work on vision-based flame and smoke detection.</p>
+      <ul class="chips" aria-label="Research interests">
+        <li>Vision-Language-Action models</li><li>Imitation learning</li><li>Reinforcement learning</li>
+        <li>World models</li><li>Teleoperation</li><li>Embodied AI</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block" id="news">
+    <div class="label">Log<strong>News</strong></div>
+    <div class="content">
+      <ul class="log">
+        <li><span class="mono">Fall 2026</span><span>Applying to robotics PhD programs for Spring and Fall 2027.</span></li>
+        <li><span class="mono">2026</span><span>Started graduate research on real-world VLA adaptation on a UR12e with a custom DYNAMIXEL leader arm.</span></li>
+        <li><span class="mono">Sep 2025</span><span>Joined Beltways Inc. as a Software Engineering Intern, building ML hardware-health monitoring.</span></li>
+        <li><span class="mono">2025</span><span>Won the Popular Votes Award and Judges' Choice Award at the Qualcomm &amp; Microsoft On-Device AI Builders Hackathon.</span></li>
+        <li><span class="mono">Sep 2024</span><span>Began the M.S. in Electrical and Computer Engineering at Northeastern University.</span></li>
+        <li><span class="mono">Dec 2023</span><span>FSD-YOLOv8 published in Proc. SPIE 12970 (SPCS 2023).</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block" id="research">
+    <div class="label">Now<strong>Current research</strong></div>
+    <div class="content">
+      <article class="rig">
+        <div class="rig-head">
+          <div class="rig-row"><h3>Real-World VLA Adaptation on UR12e</h3><span class="mono">2026 – present</span></div>
+          <span class="org">Graduate Researcher · Northeastern University</span>
+        </div>
+        <ol class="flow" aria-label="Data and training pipeline">
+          <li><span class="n">step 1</span><span class="t">Teleoperate</span><span class="d">GELLO-style DYNAMIXEL leader arm</span></li>
+          <li><span class="n">step 2</span><span class="t">Record</span><span class="d">Dual RGB, joint state, gripper, language → LeRobot</span></li>
+          <li><span class="n">step 3</span><span class="t">Fine-tune</span><span class="d">VLA on 20 / 50 / 100 / 200 demos</span></li>
+          <li><span class="n">step 4</span><span class="t">Evaluate</span><span class="d">UR12e + Robotiq Hand-E on real tasks</span></li>
+        </ol>
+        <div class="rig-body">
+          <ul class="points">
+            <li>Built an end-to-end pipeline that turns low-cost leader-arm teleoperation into dual-RGB, robot-state, gripper, and language demonstrations in LeRobot format, then fine-tunes and evaluates VLA policies on the real robot.</li>
+            <li>Built and calibrated a custom DYNAMIXEL leader arm: joint-to-joint mapping, motor offset and sign alignment, joint-limit handling, home-pose synchronization, and gripper control for repeatable teleoperation.</li>
+            <li>Designed controlled experiments across demonstration counts and three tasks (pick-place, bolt-twist, peg-insertion) to measure sample efficiency, teleoperation quality, and robustness under distribution shift.</li>
+            <li>Developing synchronized multi-camera collection and hand-eye calibration with RealSense D435 and OAK-D, with UR RTDE state/action logging for reproducible training and evaluation.</li>
+          </ul>
+          <div class="tags"><span>UR12e</span><span>Robotiq Hand-E</span><span>DYNAMIXEL</span><span>RealSense D435 / OAK-D</span><span>UR RTDE</span><span>LeRobot</span><a href="https://github.com/Xinleilijonathan/camera_calibration_ur12e">calibration code ↗</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="projects">
+    <div class="label">Builds<strong>Selected projects</strong></div>
+    <div class="content">
+      <div class="projects">
+        <article class="proj wide">
+          <div class="proj-head"><h3>Simulation-Based VLA Policy Development</h3><span class="mono">2026</span></div>
+          <p>Fine-tuned NVIDIA Cosmos3-Nano on 250 Berkeley UR5 bottle episodes (21K valid 16-step windows) on H200 GPUs, with a 10-D action adapter for translation, 6-D rotation, and gripper. Dataset-specific action normalization gave the largest single gain. I then connected policy outputs to Isaac Sim UR10 with Lula FK/IK, corrected a 90.04° frame mismatch, and completed a verified bottle-to-pot pick-and-place baseline.</p>
+          <div class="readouts">
+            <div class="readout"><b>0.336 → 0.025</b><span>overall action MAE (−92%)</span></div>
+            <div class="readout"><b>32.7 → 1.1 cm</b><span>translation MAE</span></div>
+            <div class="readout"><b>0.352 mm</b><span>single-action EEF error in sim</span></div>
+          </div>
+          <div class="tags"><span>Cosmos</span><span>Isaac Sim</span><span>Lula IK</span><span>JAX / PyTorch</span><span>SLURM</span></div>
+        </article>
+        <article class="proj">
+          <div class="proj-head"><h3>Autonomous Robotic Packing</h3><span class="mono">2026</span></div>
+          <p>Configured UR12e motion planning in ROS 2 and MoveIt 2, brought up real hardware over RTDE, and integrated eye-tracking input for multimodal target selection in a perception-to-manipulation packing pipeline.</p>
+          <div class="tags"><span>ROS 2</span><span>MoveIt 2</span><span>RTDE</span><span>Eye tracking</span></div>
+        </article>
+        <article class="proj">
+          <div class="proj-head"><h3>Multi-Camera Hand-Eye Calibration</h3><span class="mono">2026</span></div>
+          <p>Guided calibration for the UR12e with three RealSense cameras against an AprilTag grid. It scores the geometric diversity of collected poses, solves intrinsics and extrinsics with several methods, and validates on held-out poses.</p>
+          <div class="tags"><a href="https://github.com/Xinleilijonathan/camera_calibration_ur12e">GitHub ↗</a><span>AprilTag</span><span>RealSense</span></div>
+        </article>
+        <article class="proj wide">
+          <div class="proj-head"><h3>On-Device Fitness Coach</h3><span class="mono">2025</span></div>
+          <p>An on-device AI fitness coach built at the Qualcomm &amp; Microsoft On-Device AI Builders Hackathon. Won both the Popular Votes Award and the Judges' Choice Award.</p>
+          <div class="tags"><a href="https://github.com/Xinleilijonathan/On-Device-Fitness-Coach">GitHub ↗</a><span>On-device AI</span><span>2 awards</span></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="publications">
+    <div class="label">Papers<strong>Publications</strong></div>
+    <div class="content">
+      <article class="pub">
+        <div class="pub-title">An Enhanced YOLOv8 for Flame and Smoke Detection with Dilated Convolution and Image Dehazing</div>
+        <div class="authors">Leibiao Hu, Chang Lu*, <strong>Xinlei Li</strong>, Yuxiang Zhu, Yipeng Lu, Sujatha Krishnamoorthy</div>
+        <div class="venue">Proc. SPIE 12970, Fourth International Conference on Signal Processing and Computer Science (SPCS 2023), 129702I</div>
+        <p>FSD-YOLOv8 adds an AOD-Net dehazing stage and dilated convolutions to YOLOv8 to separate smoke from fog and haze. On 95,314 FASDD_CV images it reaches 0.92 mAP and 0.91 F1, against 0.85 and 0.84 for baseline YOLOv8, and generalizes to Fire-Net and Wildfire Smoke &amp; Fire.</p>
+        <div class="tags"><a href="https://doi.org/10.1117/12.3012472">DOI ↗</a><a href="paper-fsd-yolov8.pdf">PDF</a><span>* corresponding author</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="experience">
+    <div class="label">Work<strong>Experience</strong></div>
+    <div class="content rows">
+      <article class="row">
+        <div class="row-head"><h3>Software Engineering Intern, Beltways Inc.</h3><span class="mono">Sep 2025 – Dec 2025</span></div>
+        <span class="org">Hebron, KY</span>
+        <ul class="points">
+          <li>Designed a Python / TypeScript sensor-data pipeline processing 10M+ signals per second, with windowed aggregation and scaling that preserved key equipment-health indicators.</li>
+          <li>Built an end-to-end ML hardware-health monitoring system with anomaly detection and proactive alerts, deployed on Docker and Kubernetes.</li>
+        </ul>
+      </article>
+      <article class="row">
+        <div class="row-head"><h3>Software Engineering Intern, Shandong Luxin Investment Holding Group</h3><span class="mono">May 2023 – Aug 2023</span></div>
+        <span class="org">Shandong, China</span>
+        <ul class="points">
+          <li>Built ERP / MES services for manufacturing automation with Spring Boot and Vue.js; cut backend response time by 40% with Redis caching and SQL optimization.</li>
+          <li>Designed RESTful microservices for quality-control workflows, contributing to a 7% reduction in manufacturing defect rates.</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="education">
+    <div class="label">School<strong>Education</strong></div>
+    <div class="content rows">
+      <article class="row">
+        <div class="row-head"><h3>Northeastern University</h3><span class="mono">Sep 2024 – Dec 2026</span></div>
+        <span class="org">M.S. Electrical and Computer Engineering (Computer Science Engineering) · Seattle, WA · GPA 3.87 / 4.0</span>
+        <p>Coursework: Machine Learning &amp; Pattern Recognition, Computer Vision, Robotics Sensing &amp; Navigation.</p>
+      </article>
+      <article class="row">
+        <div class="row-head"><h3>Wenzhou-Kean University</h3><span class="mono">Sep 2020 – Jun 2024</span></div>
+        <span class="org">B.S. Computer Science · Wenzhou, China</span>
+        <p>Coursework: Data Structures, Computer Architecture, Operating Systems.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" id="skills">
+    <div class="label">Stack<strong>Skills &amp; honors</strong></div>
+    <div class="content">
+      <dl class="spec">
+        <dt>Robotics</dt><dd>ROS 2, MoveIt 2, UR RTDE, Isaac Sim / Isaac Lab, Lula, LeRobot; UR12e / UR10 / UR5, Robotiq Hand-E, DYNAMIXEL</dd>
+        <dt>Learning &amp; CV</dt><dd>PyTorch, JAX, OpenCV, YOLOv8, NVIDIA Cosmos, VLA fine-tuning, imitation learning, action normalization</dd>
+        <dt>Sensors</dt><dd>RealSense D435 / D405, OAK-D, multi-view RGB, camera calibration, LeRobot datasets</dd>
+        <dt>Systems</dt><dd>Python, C/C++, Java, Go, SQL, Bash, Linux, Docker, Kubernetes, SLURM / HPC</dd>
+        <dt>Honors</dt><dd>Popular Votes Award &amp; Judges' Choice Award, Qualcomm &amp; Microsoft On-Device AI Builders Hackathon (2025); Oracle Certified Professional, MySQL 8.0 Database Developer</dd>
+      </dl>
+    </div>
+  </section>
+
+  <footer>
+    <span class="mono">Xinlei Li · Seattle, WA</span>
+    <span class="mono">Updated October 2026</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  /* email copy */
+  var btn = document.getElementById('copy-email'), el = document.getElementById('email');
+  btn.addEventListener('click', function () {
+    function selectIt() {
+      var r = document.createRange(); r.selectNodeContents(el);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); btn.textContent = 'Selected';
+    }
+    try { navigator.clipboard.writeText(el.textContent.trim()).then(function () { btn.textContent = 'Copied'; }, selectIt); }
+    catch (e) { selectIt(); }
+    setTimeout(function () { btn.textContent = 'Copy'; }, 1800);
+  });
+
+  /* two-link follower arm: pointer = leader, arm tracks it through IK with first-order lag */
+  var stage = document.getElementById('stage'), cv = document.getElementById('arm'), ctx = cv.getContext('2d');
+  var q1El = document.getElementById('q1'), q2El = document.getElementById('q2'), eeEl = document.getElementById('ee'), modeEl = document.getElementById('mode');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 0, H = 0, dpr = 1, S = 1;            // S: pixels per metre
+  var L1 = 0.42, L2 = 0.36;                    // link lengths (m)
+  var q = [0.9, -1.4];                         // follower joints (rad)
+  var target = { x: 0.35, y: 0.25 };           // metres, base frame
+  var pointer = null, lastMove = 0, t0 = performance.now();
+  var cube = { x: 0.48, y: 0, held: false };
+  var PICK = { x: 0.48, y: 0.03 }, PLACE = { x: -0.30, y: 0.03 };
+
+  function size() {
+    var r = stage.getBoundingClientRect(); dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    S = Math.min(W / 1.7, H / 1.0);
+  }
+  function base() { return { x: W / 2, y: H * 0.86 }; }
+  function toWorld(px, py) { var b = base(); return { x: (px - b.x) / S, y: (b.y - py) / S }; }
+  function toPx(x, y) { var b = base(); return { x: b.x + x * S, y: b.y - y * S }; }
+
+  function ik(x, y) {
+    var d = Math.hypot(x, y), max = L1 + L2 - 0.002, min = Math.abs(L1 - L2) + 0.002;
+    if (y < 0.01) y = 0.01;
+    d = Math.hypot(x, y);
+    if (d > max) { x *= max / d; y *= max / d; d = max; }
+    if (d < min) { x *= min / d; y *= min / d; d = min; }
+    var c2 = (d * d - L1 * L1 - L2 * L2) / (2 * L1 * L2);
+    var t2 = -Math.acos(Math.max(-1, Math.min(1, c2)));           // elbow up
+    var t1 = Math.atan2(y, x) - Math.atan2(L2 * Math.sin(t2), L1 + L2 * Math.cos(t2));
+    return [t1, t2];
+  }
+  function fk(a) {
+    var e = { x: L1 * Math.cos(a[0]), y: L1 * Math.sin(a[0]) };
+    return { elbow: e, ee: { x: e.x + L2 * Math.cos(a[0] + a[1]), y: e.y + L2 * Math.sin(a[0] + a[1]) } };
+  }
+  function wrap(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; }
+
+  /* autonomous pick-and-place script, period 8 s */
+  function scripted(t) {
+    var p = (t / 8000) % 1, lift = 0.32;
+    function lerp(a, b, s) { s = s < 0 ? 0 : s > 1 ? 1 : s; s = s * s * (3 - 2 * s); return { x: a.x + (b.x - a.x) * s, y: a.y + (b.y - a.y) * s }; }
+    var pickUp = { x: PICK.x, y: lift }, placeUp = { x: PLACE.x, y: lift };
+    if (p < 0.12) { cube.held = false; return lerp(placeUp, pickUp, p / 0.12); }
+    if (p < 0.24) return lerp(pickUp, PICK, (p - 0.12) / 0.12);
+    if (p < 0.30) { cube.held = true; return PICK; }
+    if (p < 0.42) return lerp(PICK, pickUp, (p - 0.30) / 0.12);
+    if (p < 0.62) return lerp(pickUp, placeUp, (p - 0.42) / 0.20);
+    if (p < 0.74) return lerp(placeUp, PLACE, (p - 0.62) / 0.12);
+    if (p < 0.80) { cube.held = false; return PLACE; }
+    if (p < 0.92) return lerp(PLACE, placeUp, (p - 0.80) / 0.12);
+    return placeUp;
+  }
+
+  function colors() {
+    var cs = getComputedStyle(document.documentElement);
+    return { ink: cs.getPropertyValue('--ink').trim(), muted: cs.getPropertyValue('--muted').trim(), grid: cs.getPropertyValue('--grid-major').trim(), sig: cs.getPropertyValue('--signal').trim(), panel: cs.getPropertyValue('--panel').trim() };
+  }
+
+  function draw(col) {
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = col.panel; ctx.fillRect(0, 0, W, H);
+    var b = base();
+    /* reach envelope */
+    ctx.strokeStyle = col.grid; ctx.lineWidth = 1; ctx.setLineDash([4, 5]);
+    ctx.beginPath(); ctx.arc(b.x, b.y, (L1 + L2) * S, Math.PI, 2 * Math.PI); ctx.stroke(); ctx.setLineDash([]);
+    /* table */
+    ctx.strokeStyle = col.ink; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(10, b.y); ctx.lineTo(W - 10, b.y); ctx.stroke();
+    for (var i = 14; i < W - 10; i += 12) { ctx.beginPath(); ctx.moveTo(i, b.y); ctx.lineTo(i - 6, b.y + 6); ctx.strokeStyle = col.grid; ctx.stroke(); }
+    /* place zone */
+    var pz = toPx(PLACE.x, 0); ctx.strokeStyle = col.muted; ctx.setLineDash([3, 3]); ctx.strokeRect(pz.x - 0.06 * S, pz.y - 0.06 * S, 0.12 * S, 0.06 * S); ctx.setLineDash([]);
+    ctx.fillStyle = col.muted; ctx.font = '11px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; ctx.fillText('place', pz.x, pz.y + 20);
+    var pk = toPx(PICK.x, 0); ctx.fillText('pick', pk.x, pk.y + 20);
+
+    var k = fk(q), e = toPx(k.elbow.x, k.elbow.y), ee = toPx(k.ee.x, k.ee.y);
+    /* cube */
+    var cs = 0.06 * S, cp;
+    if (cube.held) { cube.x = k.ee.x; cube.y = k.ee.y - 0.05; }
+    cp = toPx(cube.x, Math.max(cube.y, 0) + 0.03);
+    ctx.fillStyle = col.sig; ctx.fillRect(cp.x - cs / 2, cp.y - cs / 2, cs, cs);
+    /* target crosshair (leader) */
+    var tp = toPx(target.x, target.y);
+    ctx.strokeStyle = col.muted; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(tp.x - 8, tp.y); ctx.lineTo(tp.x + 8, tp.y); ctx.moveTo(tp.x, tp.y - 8); ctx.lineTo(tp.x, tp.y + 8); ctx.stroke();
+    ctx.beginPath(); ctx.arc(tp.x, tp.y, 4, 0, 2 * Math.PI); ctx.stroke();
+    /* base */
+    ctx.fillStyle = col.ink; ctx.fillRect(b.x - 26, b.y - 14, 52, 14);
+    /* links */
+    ctx.lineCap = 'round'; ctx.strokeStyle = col.ink; ctx.lineWidth = Math.max(10, S * 0.05);
+    ctx.beginPath(); ctx.moveTo(b.x, b.y - 14); ctx.lineTo(e.x, e.y); ctx.lineTo(ee.x, ee.y); ctx.stroke();
+    ctx.strokeStyle = col.sig; ctx.lineWidth = Math.max(4, S * 0.016);
+    ctx.beginPath(); ctx.moveTo(b.x, b.y - 14); ctx.lineTo(e.x, e.y); ctx.lineTo(ee.x, ee.y); ctx.stroke();
+    /* joints */
+    [[b.x, b.y - 14], [e.x, e.y]].forEach(function (p) {
+      ctx.fillStyle = col.panel; ctx.beginPath(); ctx.arc(p[0], p[1], Math.max(7, S * 0.03), 0, 2 * Math.PI); ctx.fill();
+      ctx.strokeStyle = col.ink; ctx.lineWidth = 2.5; ctx.stroke();
+    });
+    /* gripper: always points down */
+    var g = Math.max(7, S * 0.03), open = cube.held ? cs / 2 : cs / 2 + 6;
+    ctx.strokeStyle = col.ink; ctx.lineWidth = 3; ctx.lineCap = 'butt';
+    ctx.beginPath(); ctx.moveTo(ee.x - open, ee.y); ctx.lineTo(ee.x + open, ee.y);
+    ctx.moveTo(ee.x - open, ee.y); ctx.lineTo(ee.x - open, ee.y + g * 1.6);
+    ctx.moveTo(ee.x + open, ee.y); ctx.lineTo(ee.x + open, ee.y + g * 1.6); ctx.stroke();
+
+    q1El.textContent = (q[0] * 180 / Math.PI).toFixed(1) + '°';
+    q2El.textContent = (q[1] * 180 / Math.PI).toFixed(1) + '°';
+    eeEl.textContent = k.ee.x.toFixed(3) + ', ' + k.ee.y.toFixed(3) + ' m';
+  }
+
+  function step(now) {
+    var teleop = pointer && now - lastMove < 2500;
+    modeEl.textContent = teleop ? 'mode: teleop' : 'mode: autonomous';
+    if (teleop) { target = pointer; if (cube.held) cube.held = false; }
+    else {
+      var tg = scripted(now - t0); target = { x: tg.x, y: tg.y + 0.05 };
+      if (!cube.held && cube.y > 0.001) { cube.y = Math.max(0, cube.y - 0.02); }
+      if (!cube.held && cube.y <= 0.001) {
+        var p = ((now - t0) / 8000) % 1;
+        if (p < 0.02) { cube.x = PICK.x; cube.y = 0; }
+      }
+    }
+    var goal = ik(target.x, target.y), a = 0.12;
+    q[0] += wrap(goal[0] - q[0]) * a; q[1] += wrap(goal[1] - q[1]) * a;
+    draw(colors());
+    if (!reduce) requestAnimationFrame(step);
+  }
+
+  function onMove(ev) {
+    var r = cv.getBoundingClientRect();
+    pointer = toWorld(ev.clientX - r.left, ev.clientY - r.top); lastMove = performance.now();
+    if (reduce) { var g = ik(pointer.x, pointer.y); q = g; target = pointer; draw(colors()); }
+  }
+  stage.addEventListener('pointermove', onMove);
+  stage.addEventListener('pointerdown', onMove);
+  stage.addEventListener('pointerleave', function () { lastMove = 0; });
+
+  size();
+  q = ik(target.x, target.y);
+  if ('ResizeObserver' in window) new ResizeObserver(function () { size(); if (reduce) draw(colors()); }).observe(stage);
+  else window.addEventListener('resize', size);
+  if (reduce) { target = { x: 0.35, y: 0.3 }; q = ik(target.x, target.y); draw(colors()); }
+  else requestAnimationFrame(step);
+})();
+</script>
+
+</body>
+</html>
