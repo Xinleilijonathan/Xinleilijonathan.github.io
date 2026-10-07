@@ -174,6 +174,42 @@ ul.points li::marker { color: var(--signal); content: "■  "; font-size: 0.7em;
 .spec dt { font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding-top: 13px; }
 .spec dd { font-size: var(--t-sm); min-width: 0; }
 
+/* progress, chart, proposal */
+.status-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.track { list-style: none; margin: 0; padding: 14px 20px 18px; display: grid; gap: 8px; font-size: var(--t-sm); }
+.track li { display: grid; grid-template-columns: 4.2em minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.track .st { font-family: var(--f-mono); font-size: var(--t-xs); text-align: center; padding: 1px 0; border: 1px solid var(--grid-major); color: var(--muted); }
+.track .done .st { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.track .active .st { background: var(--signal); color: var(--paper); border-color: var(--signal); }
+.track .next > span:last-child { color: var(--muted); }
+.chart-fig { margin: 0; }
+.chart-fig svg { display: block; width: 100%; height: auto; padding: 8px 10px 0; }
+.chart-fig figcaption { padding: 6px 16px 14px; line-height: 1.5; }
+.chart-fig .ax { font-family: var(--f-mono); font-size: 11px; fill: var(--muted); }
+.video-slot { border: 1.5px dashed var(--grid-major); padding: 18px 20px; display: grid; gap: 4px; background: var(--panel); }
+.video-slot p { color: var(--muted); font-size: var(--t-sm); }
+.sub { font-family: var(--f-mono); font-size: var(--t-xs); text-transform: uppercase; letter-spacing: 0.1em; color: var(--signal); margin-bottom: -10px; }
+.flow5 { grid-template-columns: repeat(5, minmax(0, 1fr)); border: 1.5px solid var(--ink); background: var(--panel); }
+ol.rq { margin: 0; padding-left: 1.6em; display: grid; gap: 8px; max-width: 72ch; }
+ol.rq li::marker { font-family: var(--f-mono); color: var(--signal); content: "RQ" counter(list-item) "  "; font-size: var(--t-xs); }
+ol.rq { padding-left: 3.4em; }
+.eq { font-family: var(--f-mono); font-size: 0.86em; white-space: nowrap; }
+.readouts.four { grid-template-columns: repeat(4, minmax(0, 1fr)); background: var(--panel); }
+.aims { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.aim { background: var(--panel); border: 1px solid var(--grid-major); padding: 16px 18px; display: grid; gap: 6px; align-content: start; }
+.aim .n { font-family: var(--f-mono); font-size: var(--t-xs); color: var(--signal); text-transform: uppercase; letter-spacing: 0.08em; }
+.aim h4 { margin: 0; font-family: var(--f-display); font-weight: 700; font-stretch: 108%; font-size: 1.02rem; line-height: 1.25; }
+.aim p { font-size: var(--t-sm); color: var(--muted); }
+@media (max-width: 900px) {
+  .status-grid, .aims { grid-template-columns: minmax(0, 1fr); }
+  .readouts.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flow5 { grid-template-columns: minmax(0, 1fr); }
+  .flow5 li { border-right: 0; border-bottom: 1px dashed var(--grid-major); }
+  .flow5 li:last-child { border-bottom: 0; }
+  .flow5 li:not(:last-child)::after { display: none; }
+}
+@media (max-width: 620px) { .readouts.four { grid-template-columns: minmax(0, 1fr); } .eq { white-space: normal; } }
+
 footer { border-top: 1.5px solid var(--ink); padding-block: 22px 48px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 
 @media (max-width: 900px) {
@@ -205,7 +241,10 @@ footer { border-top: 1.5px solid var(--ink); padding-block: 22px 48px; display: 
   <div class="shell">
     <a class="mark" href="#top">XINLEI LI</a>
     <nav class="nav" aria-label="Sections">
-      <a href="#research">Research</a>
+      <a href="#research">Now</a>
+      <a href="#thesis">Thesis</a>
+      <a href="#proposal">Proposal</a>
+      <a href="#future">Future</a>
       <a href="#projects">Projects</a>
       <a href="#publications">Publications</a>
       <a href="#experience">Experience</a>
@@ -263,6 +302,7 @@ footer { border-top: 1.5px solid var(--ink); padding-block: 22px 48px; display: 
     <div class="content">
       <ul class="log">
         <li><span class="mono">Fall 2026</span><span>Applying to robotics PhD programs for Spring and Fall 2027.</span></li>
+        <li><span class="mono">Oct 2026</span><span>Finished the first π0.5 fine-tune with real-time chunking on 60 UR12e teleoperated demonstrations.</span></li>
         <li><span class="mono">2026</span><span>Started graduate research on real-world VLA adaptation on a UR12e with a custom DYNAMIXEL leader arm.</span></li>
         <li><span class="mono">Sep 2025</span><span>Joined Beltways Inc. as a Software Engineering Intern, building ML hardware-health monitoring.</span></li>
         <li><span class="mono">2025</span><span>Won the Popular Votes Award and Judges' Choice Award at the Qualcomm &amp; Microsoft On-Device AI Builders Hackathon.</span></li>
@@ -278,11 +318,11 @@ footer { border-top: 1.5px solid var(--ink); padding-block: 22px 48px; display: 
       <article class="rig">
         <div class="rig-head">
           <div class="rig-row"><h3>Real-World VLA Adaptation on UR12e</h3><span class="mono">2026 – present</span></div>
-          <span class="org">Graduate Researcher · Northeastern University</span>
+          <span class="org">Graduate Researcher · Northeastern University · Advisor: Prof. Xian Li</span>
         </div>
         <ol class="flow" aria-label="Data and training pipeline">
           <li><span class="n">step 1</span><span class="t">Teleoperate</span><span class="d">GELLO-style DYNAMIXEL leader arm</span></li>
-          <li><span class="n">step 2</span><span class="t">Record</span><span class="d">Dual RGB, joint state, gripper, language → LeRobot</span></li>
+          <li><span class="n">step 2</span><span class="t">Record</span><span class="d">3 RGB views, joint state, gripper, language → LeRobot</span></li>
           <li><span class="n">step 3</span><span class="t">Fine-tune</span><span class="d">VLA on 20 / 50 / 100 / 200 demos</span></li>
           <li><span class="n">step 4</span><span class="t">Evaluate</span><span class="d">UR12e + Robotiq Hand-E on real tasks</span></li>
         </ol>
@@ -293,9 +333,118 @@ footer { border-top: 1.5px solid var(--ink); padding-block: 22px 48px; display: 
             <li>Designed controlled experiments across demonstration counts and three tasks (pick-place, bolt-twist, peg-insertion) to measure sample efficiency, teleoperation quality, and robustness under distribution shift.</li>
             <li>Developing synchronized multi-camera collection and hand-eye calibration with RealSense D435 and OAK-D, with UR RTDE state/action logging for reproducible training and evaluation.</li>
           </ul>
-          <div class="tags"><span>UR12e</span><span>Robotiq Hand-E</span><span>DYNAMIXEL</span><span>RealSense D435 / OAK-D</span><span>UR RTDE</span><span>LeRobot</span><a href="https://github.com/Xinleilijonathan/camera_calibration_ur12e">calibration code ↗</a></div>
+          <div class="tags"><span>UR12e</span><span>Robotiq Hand-E</span><span>DYNAMIXEL</span><span>RealSense D435 / OAK-D</span><span>UR RTDE</span><span>LeRobot</span><span>π0.5 + RTC</span><a href="https://github.com/Xinleilijonathan/camera_calibration_ur12e">calibration code ↗</a></div>
         </div>
       </article>
+
+      <div class="status-grid">
+        <article class="rig">
+          <div class="rig-head"><div class="rig-row"><h3>Progress</h3><span class="mono">as of Oct 2026</span></div></div>
+          <ol class="track">
+            <li class="done"><span class="st">done</span><span>Isaac Sim / Isaac Lab UR scenes and dataset adapters for DROID, RoboMIND, Berkeley UR5, RoboLabSim</span></li>
+            <li class="done"><span class="st">done</span><span>Cosmos3-Nano post-training baselines; joint actions more stable than EEF</span></li>
+            <li class="done"><span class="st">done</span><span>Leader arm built and calibrated for repeatable teleoperation</span></li>
+            <li class="done"><span class="st">done</span><span>Three-camera hand-eye calibration (two third-person views, one wrist view)</span></li>
+            <li class="done"><span class="st">done</span><span>60 teleoperated demonstrations of red-block pick-and-place into a box</span></li>
+            <li class="done"><span class="st">done</span><span>π0.5 fine-tuned with real-time chunking: 5,000 steps on 2 GPUs</span></li>
+            <li class="active"><span class="st">now</span><span>Offline action evaluation across checkpoints</span></li>
+            <li class="next"><span class="st">next</span><span>First closed-loop test on the UR12e</span></li>
+            <li class="next"><span class="st">later</span><span>Demonstration-scaling study (20 / 50 / 100 / 200) on three tasks</span></li>
+          </ol>
+        </article>
+        <figure class="rig chart-fig">
+          <div class="rig-head"><div class="rig-row"><h3>Fine-tuning loss</h3><span class="mono">log scale</span></div></div>
+          <svg id="loss" viewBox="0 0 640 250" role="img" aria-label="Training loss falls from 0.039 at step 0 to about 0.002 at step 5000"></svg>
+          <figcaption class="mono">π0.5 + RTC on 60 demonstrations, batch 16, cosine LR 2.5e-5 → 2.5e-6. Loss falls from 0.039 to about 0.002.</figcaption>
+        </figure>
+      </div>
+
+      <div class="video-slot">
+        <span class="mono">closed-loop demo</span>
+        <p>Robot videos will appear here after the first closed-loop test on the UR12e.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="thesis">
+    <div class="label">Thesis<strong>M.S. thesis</strong></div>
+    <div class="content">
+      <div class="rig-row"><h3>Simulation-to-Real Demonstration Scaling for Vision-Language-Action Robot Learning on a UR12e Platform</h3><span class="mono">in progress · Dec 2026</span></div>
+      <span class="org">Advisor: Prof. Xian Li · Northeastern University, Electrical and Computer Engineering</span>
+      <p>VLA models connect images, language, and robot actions, but how well they work on a new robot depends on the quantity, quality, diversity, and embodiment match of the post-training data. Real demonstrations are slow to collect, and failed policies can damage hardware. My thesis builds a reproducible simulation-to-real pipeline for a UR12e with a Robotiq Hand-E gripper, and uses it to measure what drives real-robot success: how many demonstrations, which ones, in which action space, and from which camera views.</p>
+      <div class="sub">Expected contributions</div>
+      <ul class="points">
+        <li>A reproducible simulation-to-real VLA training pipeline for the UR12e.</li>
+        <li>LeRobot-compatible dataset adapters and manifests for DROID, RoboMIND, Berkeley UR5, and RoboLabSim.</li>
+        <li>Demonstration-scaling curves that relate task performance to data quantity and compute.</li>
+        <li>A controlled comparison of joint-position and end-effector-pose action representations.</li>
+        <li>A demonstration-quality filtering and weighting study.</li>
+        <li>A multi-view and simulation-to-real evaluation with quantitative failure analysis.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="block" id="proposal">
+    <div class="label">Plan<strong>Research proposal</strong></div>
+    <div class="content">
+      <ol class="flow flow5" aria-label="Research pipeline">
+        <li><span class="n">stage 1</span><span class="t">Simulation</span><span class="d">Isaac Sim / Isaac Lab UR scenes</span></li>
+        <li><span class="n">stage 2</span><span class="t">Demonstrations</span><span class="d">Leader arm, public datasets</span></li>
+        <li><span class="n">stage 3</span><span class="t">VLA training</span><span class="d">Cosmos3-Nano, π0.5</span></li>
+        <li><span class="n">stage 4</span><span class="t">Real robot</span><span class="d">UR12e + Hand-E</span></li>
+        <li><span class="n">stage 5</span><span class="t">Evaluation</span><span class="d">Success, failures, robustness</span></li>
+      </ol>
+
+      <div class="sub">What early experiments showed</div>
+      <p>Initial post-training with a Cosmos3-Nano action policy on RoboLabSim, Berkeley UR5, DROID, and RoboMIND validated the training and adapter workflow. It also showed that a good training loss does not by itself produce reliable robot behavior.</p>
+      <ul class="points">
+        <li>Joint-position action policies were more stable than end-effector-pose policies.</li>
+        <li>Grasp precision and depth alignment were the main failure modes.</li>
+        <li>Gripper open/close timing was not learned consistently.</li>
+        <li>Large datasets contain jitter, failed grasps, and recovery motions that can lower policy quality.</li>
+        <li>Small-subset tests help with debugging but cannot pick the best data mixture.</li>
+      </ul>
+
+      <div class="sub">Research questions</div>
+      <ol class="rq">
+        <li>How does performance scale with demonstration count when the model and evaluation protocol stay fixed?</li>
+        <li>Does joint-position control beat end-effector-pose control once dataset size and compute are matched?</li>
+        <li>Can trajectory-quality filtering or weighted sampling beat training on every demonstration?</li>
+        <li>How do simulation-only, real-only, and mixed datasets affect transfer to the UR12e?</li>
+        <li>Do front-camera, wrist-camera, and combined views give different results on grasping and precision tasks?</li>
+        <li>How sensitive are the conclusions to random seed, task difficulty, object perturbation, and embodiment?</li>
+      </ol>
+
+      <div class="sub">Experimental design</div>
+      <dl class="spec">
+        <dt>Action space</dt><dd>Joint actions <span class="eq">(Δq, Δg)</span> against end-effector actions <span class="eq">(Δx, Δr, Δg)</span>, with the same observations, data, and evaluation.</dd>
+        <dt>Data scale</dt><dd>20, 50, 100, 200, 500, and 1,000 demonstrations, plus percentage subsets of large datasets, to find where performance plateaus.</dd>
+        <dt>Data quality</dt><dd><span class="eq">Q = w₁·S<sub>success</sub> + w₂·S<sub>smooth</sub> + w₃·S<sub>consistency</sub> + w₄·S<sub>safety</sub></span>. No filtering vs. hard threshold vs. quality-weighted sampling.</dd>
+        <dt>Views and data mix</dt><dd>Front only, wrist only, and both. Simulation only, real only, and mixed.</dd>
+        <dt>Robustness</dt><dd>Object-position shifts, distractors, lighting, and camera perturbations, with multiple random seeds per key condition.</dd>
+        <dt>Metrics</dt><dd>Success rate with confidence intervals, partial progress, execution time, failure rates by type, and smoothness <span class="eq">J = Σ ‖a<sub>t+1</sub> − 2a<sub>t</sub> + a<sub>t−1</sub>‖²</span>. At least 20 real rollouts per key final condition.</dd>
+      </dl>
+
+      <div class="sub">Datasets prepared</div>
+      <div class="readouts four">
+        <div class="readout"><b>~57,639</b><span>DROID episodes (success split, ~346 h)</span></div>
+        <div class="readout"><b>22,044</b><span>RoboMIND 1.0 UR5 episodes, 109 tasks, ~3M frames</span></div>
+        <div class="readout"><b>636 → 17 GB</b><span>RoboMIND raw data converted to LeRobot</span></div>
+        <div class="readout"><b>70</b><span>RoboLabSim episodes for debugging and overfit tests</span></div>
+      </div>
+      <p class="mono">Also: Berkeley AUTOLab UR5 trajectories for action-adapter development.</p>
+    </div>
+  </section>
+
+  <section class="block" id="future">
+    <div class="label">PhD<strong>Future directions</strong></div>
+    <div class="content">
+      <p>My thesis asks which data makes a VLA policy work on a real robot. In a PhD, I want to make robots need less of it, by learning beyond their demonstrations.</p>
+      <div class="aims">
+        <article class="aim"><span class="n">direction</span><h4>World models for evaluation</h4><p>Learn action-conditioned video world models from robot data, and test whether imagined rollouts rank policies the way real trials do.</p></article>
+        <article class="aim"><span class="n">direction</span><h4>RL fine-tuning of VLAs</h4><p>Improve a VLA's action head with reinforcement learning inside a learned world model, using few real rollouts to correct model errors.</p></article>
+        <article class="aim"><span class="n">direction</span><h4>Data-efficient teleoperation</h4><p>Use model uncertainty to decide which demonstrations to collect next, so each hour of teleoperation improves the policy more.</p></article>
+      </div>
     </div>
   </section>
 
@@ -558,6 +707,39 @@ footer { border-top: 1.5px solid var(--ink); padding-block: 22px 48px; display: 
   else window.addEventListener('resize', size);
   if (reduce) { target = { x: 0.35, y: 0.3 }; q = ik(target.x, target.y); draw(colors()); }
   else requestAnimationFrame(step);
+})();
+</script>
+<script>
+/* fine-tuning loss, logged every 40 steps from logs/full-10880702.log */
+(function () {
+  var raw = [0.0394,0.0219,0.0197,0.0178,0.0148,0.015,0.0159,0.012,0.0111,0.0107,0.0124,0.012,0.0094,0.0113,0.0113,0.0101,0.0105,0.0072,0.0073,0.0086,0.0096,0.0098,0.0074,0.0074,0.0077,0.0087,0.0071,0.0083,0.008,0.008,0.0061,0.0058,0.0061,0.0062,0.0065,0.0066,0.0063,0.0083,0.0059,0.0044,0.0063,0.0054,0.0058,0.0056,0.0051,0.0058,0.0056,0.005,0.0043,0.0054,0.0046,0.0048,0.0036,0.0054,0.0056,0.0039,0.0031,0.004,0.0035,0.004,0.0055,0.0034,0.0052,0.0039,0.0033,0.0031,0.0039,0.0043,0.0037,0.0037,0.0039,0.0027,0.0036,0.0033,0.0036,0.0043,0.0025,0.0032,0.0034,0.0024,0.004,0.0017,0.0032,0.0025,0.0025,0.0027,0.0029,0.0027,0.0026,0.0028,0.0027,0.0038,0.0033,0.0035,0.0024,0.0022,0.0021,0.002,0.0017,0.002,0.0018,0.0017,0.0018,0.0018,0.0031,0.0018,0.0019,0.0018,0.0022,0.0024,0.0019,0.0032,0.0019,0.0017,0.002,0.0015,0.0023,0.002,0.0022,0.001,0.0017,0.0018,0.0021,0.0019,0.0015,0.0022];
+  var svg = document.getElementById('loss');
+  if (!svg) return;
+  var L = 52, R = 626, T = 14, B = 214, ymin = Math.log10(0.001), ymax = Math.log10(0.05);
+  function X(s) { return L + (s / 5000) * (R - L); }
+  function Y(v) { return B - (Math.log10(v) - ymin) / (ymax - ymin) * (B - T); }
+  var step = raw.map(function (_, i) { return i < raw.length - 1 ? i * 40 : 4990; });
+  var smooth = raw.map(function (_, i) {
+    var a = raw.slice(Math.max(0, i - 2), Math.min(raw.length, i + 3));
+    return a.reduce(function (s, v) { return s + v; }, 0) / a.length;
+  });
+  var h = '';
+  [0.001, 0.002, 0.005, 0.01, 0.02, 0.05].forEach(function (v) {
+    h += '<line x1="' + L + '" x2="' + R + '" y1="' + Y(v) + '" y2="' + Y(v) + '" stroke="var(--grid-major)" stroke-width="1"/>';
+    h += '<text class="ax" x="' + (L - 6) + '" y="' + (Y(v) + 4) + '" text-anchor="end">' + v + '</text>';
+  });
+  [0, 1000, 2000, 3000, 4000, 5000].forEach(function (s) {
+    h += '<text class="ax" x="' + X(s) + '" y="' + (B + 18) + '" text-anchor="middle">' + (s ? s / 1000 + 'k' : '0') + '</text>';
+  });
+  h += '<line x1="' + L + '" x2="' + R + '" y1="' + B + '" y2="' + B + '" stroke="var(--ink)" stroke-width="1.5"/>';
+  h += '<polyline fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" opacity="0.7" points="' + step.map(function (s, i) { return X(s).toFixed(1) + ',' + Y(raw[i]).toFixed(1); }).join(' ') + '"/>';
+  h += '<polyline fill="none" stroke="var(--signal)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="' + step.map(function (s, i) { return X(s).toFixed(1) + ',' + Y(smooth[i]).toFixed(1); }).join(' ') + '"/>';
+  var ex = X(4990), ey = Y(smooth[smooth.length - 1]);
+  h += '<circle cx="' + ex + '" cy="' + ey + '" r="4.5" fill="var(--signal)" stroke="var(--panel)" stroke-width="2"/>';
+  h += '<text class="ax" x="' + (ex - 8) + '" y="' + (ey - 10) + '" text-anchor="end">step 4999 · ' + smooth[smooth.length - 1].toFixed(4) + '</text>';
+  h += '<text class="ax" x="' + (R) + '" y="' + (B + 34) + '" text-anchor="end">optimizer step</text>';
+  svg.setAttribute('viewBox', '0 0 640 250');
+  svg.innerHTML = h;
 })();
 </script>
 
